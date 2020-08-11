@@ -40,18 +40,20 @@ namespace itWeb.Controllers
 
             return View(data);
         }
-        public ActionResult About()
-        {
-            ViewBag.Message = "Your application description page.";
 
-            return View();
+        [HttpPost]
+        public ActionResult Transcripts(FormCollection post)
+        {
+            string id = post["id"];
+            string name = post["name"];
+            int score = Convert.ToInt32(post["score"]);
+            Student data = new Student(id,name,score);
+            return View(data);
+
+
         }
 
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
 
-            return View();
-        }
+
     }
 }
