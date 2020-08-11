@@ -4,30 +4,27 @@
 
     var date = ViewBag.Date;
     var student = ViewBag.Student;
-
     var list = ViewBag.List;
 
 }
+@model itWeb.Models.Student
 
-<style>
-    div{
-        margin-bottom: 10px;
-    }
-</style>
+@Styles.Render("~/Content/css")
+@Scripts.Render("~/bundles/modernizr")
 
-<div>
-    time now is: @date.ToString("yyyy/MM/dd HH:mm:ss")
-</div>
-<div>
-    score:@student.ToString()
-</div>
 
-<div>
-    Score list
-</div>
-@for (int i = 0; i < list.Count; i++)
-{
-    <div>
-        @list[i].ToString()
+<form style="margin-left:10px" method="get" action="/Home/Transcripts">
+    <div class="form-group">
+        <label for="exampleInputId">學號</label>
+        <input type="text" class="form-control" id="exampleInputId" name="id" placeholder="Enter email" value="@Model.id" />
     </div>
-}
+    <div class="form-group">
+        <label for="exampleInputName">Name</label>
+        <input type="text" class="form-control" id="exampleInputName" name="name" placeholder="Enter email" value="@Model.name" />
+    </div>
+    <div class="form-group">
+        <label for="exampleInputScore">Score</label>
+        <input type="text" class="form-control" id="exampleInputScore" name="score" placeholder="Enter email" value="@Model.score" />
+    </div>
+    <button type="submit" class="btn btn-primary">確定</button>
+</form>

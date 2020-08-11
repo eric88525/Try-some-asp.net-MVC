@@ -1,0 +1,28 @@
+﻿
+@{
+    Layout = null;
+}
+
+@model itWeb.Models.Student
+
+
+@Styles.Render("~/Content/css")
+@Styles.Render("~/bundles/modernizer")
+
+
+<div class="form-group">
+    <label>學號</label>
+    <label>@Model.id</label>
+</div>
+
+
+<div class="form-group">
+    <label>name</label>
+    <label>@Model.name</label>
+</div>
+
+
+<div class="form-group">
+    <label>score</label>
+    <label>@Model.score</label>
+</div>
