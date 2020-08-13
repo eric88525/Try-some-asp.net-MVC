@@ -16,8 +16,10 @@ namespace itWeb.Controllers
     {
         string connString = "server=127.0.0.1;port=3306;user id=mvcuser;password=mvcpassword;database=mvc;charset=utf8;";
         MySqlConnection conn = new MySqlConnection();
+        
+        
 
-        public ActionResult Create()
+        /*public ActionResult Create()
         {
             conn.ConnectionString = connString;
             if (conn.State != ConnectionState.Open)
@@ -54,12 +56,18 @@ namespace itWeb.Controllers
                 success = false;
             ViewBag.Success = success;
             conn.Close();
-            return View();
+            return Content(success.ToString());
 
-        }
+        }*/
+
+
+
+
 
         public ActionResult Index()
         {
+
+           
             DateTime date = DateTime.Now;
             Student data = new Student("", "", 0);
             
@@ -77,6 +85,35 @@ namespace itWeb.Controllers
 
             return View(data);
         }
+
+        public ActionResult Citys()
+        {
+            conn.ConnectionString = connString;
+            string sql = @" SELECT `id`, `city` FROM `city`";
+            MySqlCommand cmd = new MySqlCommand(sql,conn);
+            
+            List<City> list = new List<City>();
+            if (conn.State != ConnectionState.Open)
+                conn.Open();
+
+            using (MySqlDataReader dr = cmd.ExecuteReader())
+            {
+                while (dr.Read())
+                {
+                    City city = new City();
+                    city.CityId = dr["id"].ToString();
+                    city.CityName = dr["city"].ToString();
+                    list.Add(city);
+                }
+            }
+            if (conn.State != ConnectionState.Closed)
+                conn.Close();
+
+            ViewBag.List = list;
+            return View();
+
+        }
+
         public ActionResult Transcripts(string id,string name , int score )
         {
             Student data = new Student(id, name, score);

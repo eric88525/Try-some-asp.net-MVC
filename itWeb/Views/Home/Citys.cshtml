@@ -1,0 +1,21 @@
+﻿
+@{
+    Layout = null;
+    var list = ViewBag.List;
+}
+
+
+
+@Styles.Render("~/Content/css")
+@Scripts.Render("~/bundles/modernizr")
+
+<div>
+    @for (int i = 0; i < list.Count; i++)
+    {
+        @Html.Raw($"代號: {list[i].CityId}, 名稱: {list[i].CityName}")
+        <br />
+    }
+
+
+
+</div>
