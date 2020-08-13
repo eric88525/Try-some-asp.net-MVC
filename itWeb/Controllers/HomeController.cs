@@ -9,6 +9,9 @@ using System.Web.Mvc;
 // db
 using MySql.Data.MySqlClient;
 using System.Data;
+using System.Diagnostics;
+using System.EnterpriseServices;
+using Newtonsoft.Json;
 
 namespace itWeb.Controllers
 {
@@ -17,8 +20,6 @@ namespace itWeb.Controllers
         string connString = "server=127.0.0.1;port=3306;user id=mvcuser;password=mvcpassword;database=mvc;charset=utf8;";
         MySqlConnection conn = new MySqlConnection();
         
-        
-
         /*public ActionResult Create()
         {
             conn.ConnectionString = connString;
@@ -59,9 +60,6 @@ namespace itWeb.Controllers
             return Content(success.ToString());
 
         }*/
-
-
-
 
 
         public ActionResult Index()
@@ -113,6 +111,28 @@ namespace itWeb.Controllers
             return View();
 
         }
+
+        public ActionResult Cityjson()
+        {
+            List<Student> list = new List<Student>()
+            {
+                new Student() {id = "1", name = "eric", score = 80},
+                new Student() {id = "2", name = "tom", score = 90}
+            };
+            string jsonData = JsonConvert.SerializeObject(list);
+
+            var dejson = JsonConvert.DeserializeObject<List<Student>>(jsonData);
+            foreach (var s in dejson)
+            {
+                Debug.WriteLine(string.Format("id {0} name {1} score {2}", s.id, s.name, s.score));
+            }
+          
+
+            return Content(jsonData);
+
+
+        }
+
 
         public ActionResult Transcripts(string id,string name , int score )
         {
