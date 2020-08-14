@@ -17,50 +17,109 @@ namespace itWeb.Controllers
 {
     public class HomeController : Controller
     {
-        string connString = "server=127.0.0.1;port=3306;user id=mvcuser;password=mvcpassword;database=mvc;charset=utf8;";
-        MySqlConnection conn = new MySqlConnection();
         
-        /*public ActionResult Create()
+        
+        [HttpPost]
+        public ActionResult Village(string id)
         {
-            conn.ConnectionString = connString;
-            if (conn.State != ConnectionState.Open)
-                conn.Open();
-            string sql = @"INSERT INTO `City` (`Id`, `City`) VALUES
-                           ('0', '基隆市'),
-                           ('1', '臺北市'),
-                           ('2', '新北市'),
-                           ('3', '桃園市'),
-                           ('4', '新竹市'),
-                           ('5', '新竹縣'),
-                           ('6', '宜蘭縣'),
-                           ('7', '苗栗縣'),
-                           ('8', '臺中市'),
-                           ('9', '彰化縣'),
-                           ('A', '南投縣'),
-                           ('B', '雲林縣'),
-                           ('C', '嘉義市'),
-                           ('D', '嘉義縣'),
-                           ('E', '臺南市'),
-                           ('F', '高雄市'),
-                           ('G', '屏東縣'),
-                           ('H', '澎湖縣'),
-                           ('I', '花蓮縣'),
-                           ('J', '臺東縣'),
-                           ('K', '金門縣'),
-                           ('L', '連江縣');";
-            MySqlCommand cmd = new MySqlCommand(sql, conn);
-            int index = cmd.ExecuteNonQuery();
-            bool success = false;
-            if (index > 0)
-                success = true;
+            MyDataBase db = new MyDataBase();
+
+            var list = db.GetVillageList(id);
+            string result = "";
+            if (list == null)
+            {
+                return Json(result);
+            }
             else
-                success = false;
-            ViewBag.Success = success;
-            conn.Close();
-            return Content(success.ToString());
+            {
+                result = JsonConvert.SerializeObject(list);
+                return Json(result);
+            }
 
-        }*/
+        }
 
+
+
+        public class MyDataBase
+        {
+            string connString = "server=127.0.0.1;port=3306;user id=mvcuser;password=mvcpassword;database=mvc;charset=utf8;";
+
+            MySqlConnection conn = new MySqlConnection();
+
+            public MyDataBase()
+            {
+            }
+
+            
+
+            public List<City> GetCityList()
+            {
+                conn.ConnectionString = connString;
+                string sql = @" SELECT `id`, `city` FROM `city`";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+
+                List<City> list = new List<City>();
+                if (conn.State != ConnectionState.Open)
+                    conn.Open();
+
+                using (MySqlDataReader dr = cmd.ExecuteReader())
+                {
+                    while (dr.Read())
+                    {
+                        City city = new City();
+                        city.CityId = dr["id"].ToString();
+                        city.CityName = dr["city"].ToString();
+                        list.Add(city);
+                    }
+                }
+
+                if (conn.State != ConnectionState.Closed)
+                    conn.Close();
+
+                return list;
+            }
+
+            public List<Village> GetVillageList(string id)
+            {
+                string sql = @" SELECT `VillageId`, `VillageName` FROM `Village` WHERE `CityId`=" + id;
+                try
+                {
+                    conn.ConnectionString = connString;
+                    if (conn.State != ConnectionState.Open)
+                        conn.Open();
+
+                   
+                    
+                    
+                    Debug.Write(sql);
+
+                    MySqlCommand cmd = new MySqlCommand(sql, conn);
+                    List<Village> list = new List<Village>();
+
+                    using (MySqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            Village data = new Village();
+                            data.VillageId = dr["VillageId"].ToString();
+                            data.VillageName = dr["VillageName"].ToString();
+                            list.Add(data);
+                        }
+                    }
+                    return list;
+                }
+                catch (Exception ex)
+                {
+                    string error = ex.ToString();
+                    return null;
+                }
+                finally
+                {
+                    Debug.Write(sql);
+                    conn.Close();
+                }
+            }
+        }
 
         public ActionResult Index()
         {
@@ -84,30 +143,22 @@ namespace itWeb.Controllers
             return View(data);
         }
 
+        public ActionResult UserLogin()
+        {
+            
+            var db = new MyDataBase();
+
+            ViewBag.CityList = db.GetCityList() ;
+            return View();
+        }
+
+
         public ActionResult Citys()
         {
-            conn.ConnectionString = connString;
-            string sql = @" SELECT `id`, `city` FROM `city`";
-            MySqlCommand cmd = new MySqlCommand(sql,conn);
-            
-            List<City> list = new List<City>();
-            if (conn.State != ConnectionState.Open)
-                conn.Open();
+            MyDataBase db = new MyDataBase();
+            var cityList = db.GetCityList();
 
-            using (MySqlDataReader dr = cmd.ExecuteReader())
-            {
-                while (dr.Read())
-                {
-                    City city = new City();
-                    city.CityId = dr["id"].ToString();
-                    city.CityName = dr["city"].ToString();
-                    list.Add(city);
-                }
-            }
-            if (conn.State != ConnectionState.Closed)
-                conn.Close();
-
-            ViewBag.List = list;
+            ViewBag.List = cityList;
             return View();
 
         }
