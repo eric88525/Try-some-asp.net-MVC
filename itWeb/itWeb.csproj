@@ -127,6 +127,7 @@
     </Compile>
     <Compile Include="Models\City.cs" />
     <Compile Include="Models\Student.cs" />
+    <Compile Include="Models\UserData.cs" />
     <Compile Include="Models\Village.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -168,7 +169,8 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Home\Transcripts.cshtml" />
     <Content Include="Views\Home\Citys.cshtml" />
-    <Content Include="Views\Home\UserLogin.cshtml" />
+    <Content Include="Views\Home\UserRegister.cshtml" />
+    <Content Include="Views\Home\Login.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

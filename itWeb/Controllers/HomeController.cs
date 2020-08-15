@@ -17,12 +17,12 @@ namespace itWeb.Controllers
 {
     public class HomeController : Controller
     {
-        
+        MyDataBase db = new MyDataBase();
         
         [HttpPost]
         public ActionResult Village(string id)
         {
-            MyDataBase db = new MyDataBase();
+            
 
             var list = db.GetVillageList(id);
             string result = "";
@@ -39,7 +39,7 @@ namespace itWeb.Controllers
         }
 
 
-
+        #region DB
         public class MyDataBase
         {
             string connString = "server=127.0.0.1;port=3306;user id=mvcuser;password=mvcpassword;database=mvc;charset=utf8;";
@@ -50,8 +50,43 @@ namespace itWeb.Controllers
             {
             }
 
-            
 
+            public bool  AddUserData(UserData data)
+            {
+                try
+                {
+                    conn.ConnectionString = connString;
+                    if (conn.State != ConnectionState.Open)
+                        conn.Open();
+                    string id = Guid.NewGuid().ToString();
+                    string sql = @"INSERT INTO userdata VALUES(@id,@account,@password,@city,@village,@address)";
+                    MySqlCommand cmd = new MySqlCommand(sql, conn);
+
+                    cmd.Parameters.Add("@id", MySqlDbType.VarChar).Value = id;
+                    cmd.Parameters.Add("@account", MySqlDbType.VarChar).Value = data.account;
+                    cmd.Parameters.Add("@password", MySqlDbType.VarChar).Value = data.password1;
+                    cmd.Parameters.Add("@city", MySqlDbType.VarChar).Value = data.city;
+                    cmd.Parameters.Add("@village", MySqlDbType.VarChar).Value = data.village;
+                    cmd.Parameters.Add("@address", MySqlDbType.VarChar).Value = data.address;
+                    cmd.ExecuteNonQuery();
+                    return true;
+
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    return false;
+                }
+                finally
+                {
+
+                    conn.Close();
+
+                }
+
+                
+
+            }
             public List<City> GetCityList()
             {
                 conn.ConnectionString = connString;
@@ -120,21 +155,24 @@ namespace itWeb.Controllers
                 }
             }
         }
+        
 
-        public ActionResult Index()
+        #endregion
+       
+        
+        public ActionResult Index(FormCollection post)
         {
 
-           
             DateTime date = DateTime.Now;
             Student data = new Student("", "", 0);
-            
+
             List<Student> list = new List<Student>();
-            list.Add(new Student("1","ERIC",80));
+            list.Add(new Student("1", "ERIC", 80));
             list.Add(new Student("2", "JOHN", 30));
             list.Add(new Student("3", "LUCKY", 40));
             list.Add(new Student("4", "JOHN", 20));
             list.Add(new Student("5", "TRACY", 10));
-            
+
             ViewBag.Date = date;
             ViewBag.Student = data;
             ViewBag.List = list;
@@ -143,13 +181,65 @@ namespace itWeb.Controllers
             return View(data);
         }
 
-        public ActionResult UserLogin()
+        [HttpPost]
+        public ActionResult CheckRegister(UserData data)
+        {
+            
+
+            if (string.IsNullOrWhiteSpace(data.password1) || data.password1 != data.password2)
+            {
+                
+                var citylist = db.GetCityList();
+                ViewBag.CityList = citylist;
+                ViewBag.VillageList = new List<Village>();
+                ViewBag.Msg = "密碼錯誤";
+
+                data.password1 = "";
+                data.password2 = "";
+
+                return View("UserRegister",data);
+            }
+            else
+            {
+
+                if (db.AddUserData(data))
+                {
+                    Response.Redirect("~/Home/Login");
+                    return new EmptyResult();
+                }
+                else
+                {
+
+                    data.password1 = "";
+                    data.password2 = "";
+                    ViewBag.Msg = "註冊失敗...";
+                    return View("UserRegister", data);
+                }
+            }
+        }
+        [HttpPost]
+        public ActionResult CheckLogin(UserData data)
+        {
+            return View();
+
+        }
+
+
+        public ActionResult Login()
+        {
+
+            return View();
+        }
+
+        public ActionResult UserRegister()
         {
             
             var db = new MyDataBase();
 
             ViewBag.CityList = db.GetCityList() ;
-            return View();
+            ViewBag.VillageList = new List<Village>();
+
+            return View(new UserData());
         }
 
 
