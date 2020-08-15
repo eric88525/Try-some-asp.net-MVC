@@ -11,6 +11,8 @@ using MySql.Data.MySqlClient;
 using System.Data;
 using System.Diagnostics;
 using System.EnterpriseServices;
+using System.Web.Configuration;
+using System.Web.UI.WebControls;
 using Newtonsoft.Json;
 
 namespace itWeb.Controllers
@@ -48,6 +50,49 @@ namespace itWeb.Controllers
 
             public MyDataBase()
             {
+            }
+
+
+            public bool CheckUserData(string account,string password)
+            {
+
+
+                try
+                {
+                    conn.ConnectionString = connString;
+                    if (conn.State != ConnectionState.Open)
+                        conn.Open();
+
+                    string sql = "select 1 from userdata where account='" + @account + "' and " + "password='" + @password + "';";
+
+                    Debug.Write(sql);
+                    MySqlCommand cmd = new MySqlCommand(sql, conn);
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+
+                    }
+
+                }
+                catch (Exception e)
+                {
+
+
+                    string error = e.ToString();
+                    return false;
+                }
+                finally
+                {
+                    conn.Close();
+
+                }
             }
 
 
@@ -217,10 +262,36 @@ namespace itWeb.Controllers
                 }
             }
         }
-        [HttpPost]
-        public ActionResult CheckLogin(UserData data)
+
+
+        public ActionResult SuccessLogin()
         {
             return View();
+        }
+
+
+
+
+        [HttpPost]
+        public ActionResult CheckLogin(FormCollection post)
+        {
+
+            string account = post["account"];
+            string password = post["password"];
+
+            if (db.CheckUserData(account, password))
+            {
+
+                Session["account"] = account;
+                Response.Redirect("~/Home/SuccessLogin");
+                return new EmptyResult();
+            }
+            else
+            {
+                ViewBag.Msg = "login failed";
+                return View("Login");
+            }
+
 
         }
 

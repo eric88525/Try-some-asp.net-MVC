@@ -1,0 +1,27 @@
+﻿
+@{
+    Layout = null;
+    var account = "";
+    if (Session["account"] == null || string.IsNullOrWhiteSpace(Session["account"].ToString()))
+    {
+        Response.Redirect("~/Home/UserLogin");
+
+
+    }
+    else
+    {
+        account = Session["account"].ToString();
+    }
+
+}
+
+
+
+
+@Styles.Render("~/Content/css")
+@Scripts.Render("~/bundles/modernizr")
+
+
+
+<h1>Success @account</h1>
+
